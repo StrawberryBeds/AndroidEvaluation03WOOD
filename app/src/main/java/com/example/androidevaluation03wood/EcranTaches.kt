@@ -53,28 +53,6 @@ fun EcransTaches(viewModel: ViewModelTaches, navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.padding(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Button(
-                    onClick = {
-                        viewModel.deconecterUtilisateur()
-                        navController.navigate("se_connecter")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 8.dp),
-                    colors = ButtonColors(
-                        containerColor = Red,
-                        contentColor = White,
-                        disabledContainerColor = Red,
-                        disabledContentColor = White
-                    )
-                ) {
-                    Text("Se déconnecter ")
-                }
-            }
-            Spacer(modifier = Modifier.padding(8.dp))
             Text(
                 "Nouvelle tache",
                 style = MaterialTheme.typography.headlineMedium

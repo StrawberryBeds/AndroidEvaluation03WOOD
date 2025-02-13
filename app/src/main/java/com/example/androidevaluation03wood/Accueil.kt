@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
@@ -61,57 +64,26 @@ fun Accueil(viewModel: ViewModelTaches, navController: NavHostController) {
             Spacer(
                 modifier = Modifier.padding(8.dp)
             )
+            Spacer(modifier = Modifier.padding(8.dp))
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                BasicTextField(
-                    value = nouvelleNomTache,
-                    onValueChange = { nouvelleNomTache = it },
-                    modifier = Modifier
-                        .weight(1f)
-                        .border(1.dp, Gray)
-                        .padding(8.dp)
-                )
-            }
-            Spacer(
-                modifier = Modifier.padding(8.dp)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                BasicTextField(
-                    value = nouvelleDescriptionTache,
-                    onValueChange = { nouvelleDescriptionTache = it },
-                    modifier = Modifier
-                        .weight(1f)
-                        .border(1.dp, Gray)
-                        .padding(8.dp)
-                )
-            }
-            Spacer(
-                modifier = Modifier
-                    .padding(8.dp)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
                     onClick = {
-                        if (nouvelleNomTache.isNotBlank()) {
-                            viewModel.ajouteTache(nouvelleNomTache, nouvelleDescriptionTache)
-                            nouvelleNomTache = ""
-                            nouvelleDescriptionTache = ""
-                            estTerminee = false
-                        }
+                        viewModel.deconecterUtilisateur()
+                        navController.navigate("se_connecter")
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 8.dp)
+                        .padding(start = 8.dp),
+                    colors = ButtonColors(
+                        containerColor = Red,
+                        contentColor = White,
+                        disabledContainerColor = Red,
+                        disabledContentColor = White
+                    )
                 ) {
-                    Text("Ajouter")
+                    Text("Se déconnecter ")
                 }
             }
         }
