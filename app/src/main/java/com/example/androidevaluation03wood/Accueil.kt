@@ -72,7 +72,7 @@ fun Accueil(viewModel: ViewModelTaches, navController: NavHostController) {
             ) {
                 Button(
                     onClick = {
-                        viewModel.deconecterUtilisateur()
+                        viewModel.deconecterUtilisateur(nomUtilisateur = utilisateur.nomUtilisateur)
                         navController.navigate("se_connecter")
                     },
                     modifier = Modifier

@@ -1,6 +1,7 @@
 package com.example.androidevaluation03wood
 
 import android.app.Application
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.widget.Toast
 import android.widget.Toast.makeText
@@ -11,19 +12,20 @@ import androidx.lifecycle.AndroidViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-data class Utilisateur(
-    val nomEtPrenom: String = "Penny Counter",
-    val nomUtilisateur: String = "user@example.com",
-    val motDePasse: String = "password123",
-    var estVerifie: Boolean = false,
-    val tachesDuUtilisateur: Any = mutableStateListOf<Tache>()
-)
+
 
 data class Tache(
     val idTache: Int,
     val nomTache: String,
     val descriptionTache: String,
     var estTerminee: Boolean
+)
+
+class Utilisateur(
+    val nomEtPrenom: String = "Penny Counter",
+    val nomUtilisateur: String = "user@example.com",
+    val motDePasse: String = "password123",
+    var estVerifie: Boolean = false,
 )
 
 
@@ -52,19 +54,27 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
     )
     val utilisateur: Utilisateur get() = _utilisateur
 
-    fun verifierUtilisateur(nomUtilisateur: String, motDePasse: String): Boolean {
+ fun verifierUtilisateur(nomUtilisateur: String, motDePasse: String): Boolean {
         val estVerifie = (utilisateur.nomUtilisateur == nomUtilisateur) && (utilisateur.motDePasse == motDePasse)
-        utilisateur.estVerifie = estVerifie
+//        utilisateur.estVerifie = estVerifie
 
         sharedPreferences.edit().putBoolean("UTILISATEUR_VERIFIE", estVerifie).apply()
         return estVerifie
     }
-    fun deconecterUtilisateur() {
+    fun deconecterUtilisateur(nomUtilisateur: String) {
+        val nomFichier = apporteNomFichierUtilisateur(nomUtilisateur)
+        val sharedPreferencesUtilisateur = getApplication<Application>().getSharedPreferences(nomFichier, Context.MODE_PRIVATE)
+        sharedPreferencesUtilisateur.edit().clear().apply()
         utilisateur.estVerifie = false
+
         sharedPreferences.edit().putBoolean("UTILISATEUR_VERIFIE", false).apply()
     }
     fun estUtilisateurVerifie(): Boolean {
         return utilisateur.estVerifie
+    }
+    private fun apporteNomFichierUtilisateur(nomUtilisateur: String): String {
+        var nomFichier = "Taches_${nomUtilisateur}"
+        return nomFichier
     }
 
     private val _taches = mutableStateListOf<Tache>() // ViewModel
@@ -72,20 +82,28 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
 
     // init avec l'aide de ChatGPT pour apporte les Taches déjà crée si existant.
     init {
-        apporteTaches()
+        apporteTaches(nomUtilisateur = utilisateur.nomUtilisateur)
     }
 
 
-    fun sauvegarderTache() {
-        val jsonStringTache = gson.toJson(_taches)
-        sharedPreferences.edit().putString("PREF_KEY_TACHES", jsonStringTache).apply()
+    fun sauvegarderTache(nomUtilisateur: String) {
+        val nomFichier = apporteNomFichierUtilisateur(nomUtilisateur)
+        val sharedPreferencesUtilisateur = getApplication<Application>().getSharedPreferences(nomFichier, Context.MODE_PRIVATE)
+        val jsonString = gson.toJson(_taches)
+        val editor =
+        sharedPreferencesUtilisateur.edit()
+        editor.putString("PREF_KEY_TACHES", jsonString)
+        editor.apply()
     }
-    fun apporteTaches() {
+    fun apporteTaches(nomUtilisateur: String) {
+        val nomFichier = apporteNomFichierUtilisateur(nomUtilisateur)
         val estVerifie = sharedPreferences.getBoolean("UTILISATEUR_VERIFIE", true)
-        val jsonStringUtilisateur = sharedPreferences.getString("NOM_ET_PRENOM",null) ?: return
-        val jsonStringTache = sharedPreferences.getString("PREF_KEY_TACHES", null) ?: return
+
+        val sharedPreferencesUtilisateur = getApplication<Application>().getSharedPreferences(nomFichier, Context.MODE_PRIVATE)
+//        val jsonStringUtilisateur = sharedPreferences.getString("NOM_ET_PRENOM",null) ?: return
+        val jsonString = sharedPreferencesUtilisateur.getString("PREF_KEY_TACHES", null) ?: return
         val listType = object : TypeToken<List<Tache>>() {}.type
-        val tacheSauves: List<Tache> = gson.fromJson(jsonStringTache, listType)
+        val tacheSauves: List<Tache> = gson.fromJson(jsonString, listType)
         _taches.clear()
         estUtilisateurVerifie()
         if (estVerifie) {
@@ -96,7 +114,7 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
         }
     }
 
-    fun ajouteTache(nomTache: String, descriptionTache: String) {
+ fun ajouteTache(nomTache: String, descriptionTache: String) {
         val nouvelleIDTache = (taches.maxOfOrNull { it.idTache } ?: 0) + 1
 
 
@@ -107,14 +125,14 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
             estTerminee = false
         )
         _taches.add(nouvelleTache)
-        sauvegarderTache()
+        sauvegarderTache(nomUtilisateur = utilisateur.nomUtilisateur)
     }
 
     // Pas trés contente avec fun modifieTache. On veut le simplifier.
     fun modifieTache (idTache: Int, nomTache: String, descriptionTache: String) {
 
         _taches.removeAll { it.idTache == idTache }
-        sauvegarderTache()
+        sauvegarderTache(nomUtilisateur = utilisateur.nomUtilisateur)
 
         val nouvelleIDTache = (taches.maxOfOrNull { it.idTache } ?: 0) + 1
 
@@ -125,12 +143,12 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
             estTerminee = false
         )
         _taches.add(nouvelleTache)
-        sauvegarderTache()
+        sauvegarderTache(nomUtilisateur = utilisateur.nomUtilisateur)
     }
 
     fun supprimeTache(idTache: Int) {
         _taches.removeAll { it.idTache == idTache }
-        sauvegarderTache()
+        sauvegarderTache(nomUtilisateur = utilisateur.nomUtilisateur)
     }
 
     fun toggleTache(idTache: Int) {
@@ -138,6 +156,6 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
             if (tache.idTache == idTache) tache.copy(estTerminee = !tache.estTerminee)
             else tache
         }
-        sauvegarderTache()
+        sauvegarderTache(nomUtilisateur = utilisateur.nomUtilisateur)
     }
 }
