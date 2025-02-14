@@ -2,10 +2,22 @@ package com.example.androidevaluation03wood
 
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
+import android.widget.Toast
+import android.widget.Toast.makeText
+import androidx.collection.emptyLongSet
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+
+data class Utilisateur(
+    val nomEtPrenom: String = "Penny Counter",
+    val nomUtilisateur: String = "user@example.com",
+    val motDePasse: String = "password123",
+    var estVerifie: Boolean = false,
+    val tachesDuUtilisateur: Any = mutableStateListOf<Tache>()
+)
 
 data class Tache(
     val idTache: Int,
@@ -14,11 +26,7 @@ data class Tache(
     var estTerminee: Boolean
 )
 
-class Utilisateur (
-    val nomEtPrenom: String = "Penny Counter",
-    val nomUtilisateur: String = "user@example.com",
-    val motDePasse: String = "password123",
-    var estVerifie: Boolean = false) {
+
 
 //    val utilisateur = Utilisateur(
 //        nomEtPrenom = "Penny Counter",
@@ -26,7 +34,7 @@ class Utilisateur (
 //        motDePasse = "password123",
 //        estVerifie = false
 //    )
-}
+
 
 class ViewModelTaches (application: Application): AndroidViewModel(application) {
 
@@ -37,7 +45,10 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
         nomEtPrenom =  sharedPreferences.getString("NOM_ET_PRENOM","Penny Counter") ?: "Penny Counter",
         nomUtilisateur = sharedPreferences.getString("NOM_UTILISATEUR","user@example.com") ?: "user@example.com",
         motDePasse = sharedPreferences.getString("MOT_DE_PASSE", "password123") ?: "password123",
-        estVerifie = sharedPreferences.getBoolean ("UTILISATEUR_VERIFIE", false)
+        estVerifie = sharedPreferences.getBoolean ("UTILISATEUR_VERIFIE", false),
+//        tachesDuUtilisateur = sharedPreferences.getString("PREF_KEY_TACHES",
+//            mutableStateListOf<Tache>().toString()
+//        ) ?: mutableStateListOf<Tache>()
     )
     val utilisateur: Utilisateur get() = _utilisateur
 
@@ -61,23 +72,30 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
 
     // init avec l'aide de ChatGPT pour apporte les Taches déjà crée si existant.
     init {
-        apporteDuPreferences()
+        apporteTaches()
     }
 
 
-    private fun sauvegarderAuPreferences() {
-        val jsonString = gson.toJson(_taches)
-        sharedPreferences.edit().putString("PREF_KEY_TACHES", jsonString).apply()
+    fun sauvegarderTache() {
+        val jsonStringTache = gson.toJson(_taches)
+        sharedPreferences.edit().putString("PREF_KEY_TACHES", jsonStringTache).apply()
     }
-    private fun apporteDuPreferences() {
-        val jsonString = sharedPreferences.getString("PREF_KEY_TACHES", null) ?: return
+    fun apporteTaches() {
+        val estVerifie = sharedPreferences.getBoolean("UTILISATEUR_VERIFIE", true)
+        val jsonStringUtilisateur = sharedPreferences.getString("NOM_ET_PRENOM",null) ?: return
+        val jsonStringTache = sharedPreferences.getString("PREF_KEY_TACHES", null) ?: return
         val listType = object : TypeToken<List<Tache>>() {}.type
-        val tacheSauves: List<Tache> = gson.fromJson(jsonString, listType)
+        val tacheSauves: List<Tache> = gson.fromJson(jsonStringTache, listType)
         _taches.clear()
-        _taches.addAll(tacheSauves)
+        estUtilisateurVerifie()
+        if (estVerifie) {
+            _taches.addAll(tacheSauves)
+        } else {
+            _taches.clear()
+//            makeText(LocalContext,"L'utilisateur n'est pas verifié", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    // Avec l'aide du ChatGPT pour le bonne gestion de idTache
     fun ajouteTache(nomTache: String, descriptionTache: String) {
         val nouvelleIDTache = (taches.maxOfOrNull { it.idTache } ?: 0) + 1
 
@@ -89,14 +107,14 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
             estTerminee = false
         )
         _taches.add(nouvelleTache)
-        sauvegarderAuPreferences()
+        sauvegarderTache()
     }
 
     // Pas trés contente avec fun modifieTache. On veut le simplifier.
     fun modifieTache (idTache: Int, nomTache: String, descriptionTache: String) {
 
         _taches.removeAll { it.idTache == idTache }
-        sauvegarderAuPreferences()
+        sauvegarderTache()
 
         val nouvelleIDTache = (taches.maxOfOrNull { it.idTache } ?: 0) + 1
 
@@ -107,12 +125,12 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
             estTerminee = false
         )
         _taches.add(nouvelleTache)
-        sauvegarderAuPreferences()
+        sauvegarderTache()
     }
 
     fun supprimeTache(idTache: Int) {
         _taches.removeAll { it.idTache == idTache }
-        sauvegarderAuPreferences()
+        sauvegarderTache()
     }
 
     fun toggleTache(idTache: Int) {
@@ -120,6 +138,6 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
             if (tache.idTache == idTache) tache.copy(estTerminee = !tache.estTerminee)
             else tache
         }
-        sauvegarderAuPreferences()
+        sauvegarderTache()
     }
 }
