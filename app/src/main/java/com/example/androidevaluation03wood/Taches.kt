@@ -15,20 +15,31 @@ data class Tache(
 )
 
 class Utilisateur (
+    val nomEtPrenom: String = "Penny Counter",
     val nomUtilisateur: String = "user@example.com",
     val motDePasse: String = "password123",
-    var estVerifie: Boolean = false)
+    var estVerifie: Boolean = false) {
+
+//    val utilisateur = Utilisateur(
+//        nomEtPrenom = "Penny Counter",
+//        nomUtilisateur = "user@example.com",
+//        motDePasse = "password123",
+//        estVerifie = false
+//    )
+}
 
 class ViewModelTaches (application: Application): AndroidViewModel(application) {
 
     private val sharedPreferences = application.getSharedPreferences("AppPrefs", MODE_PRIVATE)
     private val gson = Gson()
 
-    private var utilisateur = Utilisateur(
+    private val _utilisateur = Utilisateur(
+        nomEtPrenom =  sharedPreferences.getString("NOM_ET_PRENOM","Penny Counter") ?: "Penny Counter",
         nomUtilisateur = sharedPreferences.getString("NOM_UTILISATEUR","user@example.com") ?: "user@example.com",
         motDePasse = sharedPreferences.getString("MOT_DE_PASSE", "password123") ?: "password123",
         estVerifie = sharedPreferences.getBoolean ("UTILISATEUR_VERIFIE", false)
     )
+    val utilisateur: Utilisateur get() = _utilisateur
 
     fun verifierUtilisateur(nomUtilisateur: String, motDePasse: String): Boolean {
         val estVerifie = (utilisateur.nomUtilisateur == nomUtilisateur) && (utilisateur.motDePasse == motDePasse)

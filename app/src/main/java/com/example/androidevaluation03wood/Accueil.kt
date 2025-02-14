@@ -30,9 +30,11 @@ import androidx.navigation.NavHostController
 @Composable
 fun Accueil(viewModel: ViewModelTaches, navController: NavHostController) {
 
-    var nouvelleNomTache by remember { mutableStateOf("") }
-    var nouvelleDescriptionTache by remember { mutableStateOf("") }
-    var estTerminee by remember { mutableStateOf(false) }
+    var utilisateur = viewModel.utilisateur
+
+//    var nouvelleNomTache by remember { mutableStateOf("") }
+//    var nouvelleDescriptionTache by remember { mutableStateOf("") }
+//    var estTerminee by remember { mutableStateOf(false) }
 
     Scaffold() { paddingValues ->
         Column(
@@ -44,7 +46,7 @@ fun Accueil(viewModel: ViewModelTaches, navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                "Bienvenue !",
+                "Bienvenue ${utilisateur.nomEtPrenom}!",
                 style = MaterialTheme.typography.headlineMedium
             )
             Spacer(modifier = Modifier.padding(8.dp))
