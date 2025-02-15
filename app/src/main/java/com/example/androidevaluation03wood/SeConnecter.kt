@@ -33,6 +33,9 @@ fun SeConnecter(
     var motDePass by remember { mutableStateOf("") }
     var erreurConnexion by remember { mutableStateOf(false) }
 
+    var nouvelleNomUtilisateur by remember { mutableStateOf("") }
+    var nouvelleMotDePass by remember { mutableStateOf("") }
+
     Scaffold { paddingValues ->
         Column(
             modifier = Modifier
@@ -99,6 +102,64 @@ fun SeConnecter(
                     Text("Se Connecter")
                 }
             }
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//            ) {
+//                Text("Créer un compte", style = MaterialTheme.typography.bodyMedium)
+//            }
+//            Spacer(modifier = Modifier.padding(8.dp))
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//            ) {
+//                BasicTextField(
+//                    value = nouvelleNomUtilisateur,
+//                    onValueChange = { nouvelleNomUtilisateur = it },
+//                    modifier = Modifier
+//                        .weight(1f)
+//                        .border(1.dp, Gray)
+//                        .padding(8.dp)
+//                )
+//            }
+//            Spacer(
+//                modifier = Modifier.padding(8.dp)
+//            )
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//            ) {
+//                BasicTextField(
+//                    value = nouvelleMotDePass,
+//                    onValueChange = { nouvelleMotDePass = it },
+//                    modifier = Modifier
+//                        .weight(1f)
+//                        .border(1.dp, Gray)
+//                        .padding(8.dp)
+//                )
+//            }
+//            Spacer(
+//                modifier = Modifier
+//                    .padding(8.dp)
+//            )
+//            Row(
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Button(
+//                    onClick = {
+//                        if (nouvelleNomUtilisateur.isNotBlank() && nouvelleMotDePass.isNotBlank()) {
+//                            viewModel.ajouteUtilisateur(nouvelleNomUtilisateur, nouvelleMotDePass)
+//                            nouvelleNomUtilisateur = ""
+//                            nouvelleMotDePass = ""
+//                        }
+//                    },
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(start = 8.dp)
+//                ) {
+//                    Text("Creer nouveau compte")
+//                }
+//            }
         }
     }
 }

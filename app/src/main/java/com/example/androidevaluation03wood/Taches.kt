@@ -3,15 +3,10 @@ package com.example.androidevaluation03wood
 import android.app.Application
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import android.widget.Toast
-import android.widget.Toast.makeText
-import androidx.collection.emptyLongSet
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.AndroidViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-
 
 
 data class Tache(
@@ -21,61 +16,20 @@ data class Tache(
     var estTerminee: Boolean
 )
 
-class Utilisateur(
-    val nomEtPrenom: String = "Penny Counter",
-    val nomUtilisateur: String = "user@example.com",
-    val motDePasse: String = "password123",
-    var estVerifie: Boolean = false,
-)
-
-
-
-//    val utilisateur = Utilisateur(
-//        nomEtPrenom = "Penny Counter",
-//        nomUtilisateur = "user@example.com",
-//        motDePasse = "password123",
-//        estVerifie = false
-//    )
-
-
 class ViewModelTaches (application: Application): AndroidViewModel(application) {
 
     private val sharedPreferences = application.getSharedPreferences("AppPrefs", MODE_PRIVATE)
     private val gson = Gson()
 
     private val _utilisateur = Utilisateur(
-        nomEtPrenom =  sharedPreferences.getString("NOM_ET_PRENOM","Penny Counter") ?: "Penny Counter",
-        nomUtilisateur = sharedPreferences.getString("NOM_UTILISATEUR","user@example.com") ?: "user@example.com",
+        nomEtPrenom = sharedPreferences.getString("NOM_ET_PRENOM", "Penny Counter")
+            ?: "Penny Counter",
+        nomUtilisateur = sharedPreferences.getString("NOM_UTILISATEUR", "user@example.com")
+            ?: "user@example.com",
         motDePasse = sharedPreferences.getString("MOT_DE_PASSE", "password123") ?: "password123",
-        estVerifie = sharedPreferences.getBoolean ("UTILISATEUR_VERIFIE", false),
-//        tachesDuUtilisateur = sharedPreferences.getString("PREF_KEY_TACHES",
-//            mutableStateListOf<Tache>().toString()
-//        ) ?: mutableStateListOf<Tache>()
+        estVerifie = sharedPreferences.getBoolean("UTILISATEUR_VERIFIE", false)
     )
     val utilisateur: Utilisateur get() = _utilisateur
-
- fun verifierUtilisateur(nomUtilisateur: String, motDePasse: String): Boolean {
-        val estVerifie = (utilisateur.nomUtilisateur == nomUtilisateur) && (utilisateur.motDePasse == motDePasse)
-//        utilisateur.estVerifie = estVerifie
-
-        sharedPreferences.edit().putBoolean("UTILISATEUR_VERIFIE", estVerifie).apply()
-        return estVerifie
-    }
-    fun deconecterUtilisateur(nomUtilisateur: String) {
-        val nomFichier = apporteNomFichierUtilisateur(nomUtilisateur)
-        val sharedPreferencesUtilisateur = getApplication<Application>().getSharedPreferences(nomFichier, Context.MODE_PRIVATE)
-        sharedPreferencesUtilisateur.edit().clear().apply()
-        utilisateur.estVerifie = false
-
-        sharedPreferences.edit().putBoolean("UTILISATEUR_VERIFIE", false).apply()
-    }
-    fun estUtilisateurVerifie(): Boolean {
-        return utilisateur.estVerifie
-    }
-    private fun apporteNomFichierUtilisateur(nomUtilisateur: String): String {
-        var nomFichier = "Taches_${nomUtilisateur}"
-        return nomFichier
-    }
 
     private val _taches = mutableStateListOf<Tache>() // ViewModel
     val taches: List<Tache> get() = _taches // View
@@ -85,6 +39,10 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
         apporteTaches(nomUtilisateur = utilisateur.nomUtilisateur)
     }
 
+    fun apporteNomFichierUtilisateur(nomUtilisateur: String): String {
+        var nomFichier = "Taches_${nomUtilisateur}"
+        return nomFichier
+    }
 
     fun sauvegarderTache(nomUtilisateur: String) {
         val nomFichier = apporteNomFichierUtilisateur(nomUtilisateur)
@@ -105,7 +63,7 @@ class ViewModelTaches (application: Application): AndroidViewModel(application) 
         val listType = object : TypeToken<List<Tache>>() {}.type
         val tacheSauves: List<Tache> = gson.fromJson(jsonString, listType)
         _taches.clear()
-        estUtilisateurVerifie()
+        estVerifie
         if (estVerifie) {
             _taches.addAll(tacheSauves)
         } else {
