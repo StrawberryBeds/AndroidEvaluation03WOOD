@@ -11,10 +11,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.androidevaluation03wood.ViewModelTaches
 import com.example.androidevaluation03wood.ui.theme.AndroidEvaluation03WOODTheme
 
 // Repositoire GitHub: https://github.com/StrawberryBeds/GestionnaireDeTachesWOOD
@@ -28,7 +28,8 @@ import com.example.androidevaluation03wood.ui.theme.AndroidEvaluation03WOODTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: ViewModelTaches by viewModels()
+    private val viewModelTaches: ViewModelTaches by viewModels()
+    private val viewModelUtilisateur: ViewModelUtilisateur by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 AndroidEvaluation03WOODTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        AndroidEvaluation03WOOD(viewModel)
+                        AndroidEvaluation03WOOD(viewModelTaches, viewModelUtilisateur, navController = rememberNavController())
                     }
                 }
             }
@@ -46,12 +47,17 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AndroidEvaluation03WOOD(viewModel: ViewModelTaches) {
+fun AndroidEvaluation03WOOD(
+    viewModelTaches: ViewModelTaches,
+    viewModelUtilisateur: ViewModelUtilisateur,
+    navController: NavHostController
+) {
+
     val navController = rememberNavController()
 
     // Avec l'aide de ChatGPT pour le fonction LaunchedEffect
     LaunchedEffect(Unit) {
-        if (!viewModel.estUtilisateurVerifie()) {
+        if (!viewModelUtilisateur.estUtilisateurVerifie()) {
             navController.navigate("se_connecter")
         }
     }
@@ -60,12 +66,12 @@ fun AndroidEvaluation03WOOD(viewModel: ViewModelTaches) {
         navController = navController,
         startDestination = "accueil"
     ) {
-        composable("se_connecter") { SeConnecter(viewModel, navController) }
-        composable("accueil") { Accueil(viewModel, navController) }
-        composable("ecran_taches") { EcransTaches(viewModel, navController) }
+        composable("se_connecter") { SeConnecter(viewModelUtilisateur, navController) }
+        composable("accueil") { Accueil(viewModelUtilisateur, navController) }
+        composable("ecran_taches") { EcransTaches(viewModelTaches, navController) }
         composable("ecran_details/{taskId}") { backStackEntry ->
             val taskId = backStackEntry.arguments?.getString("taskId")?.toIntOrNull()
-            taskId?.let { EcranDetails(viewModel, navController, it) }
+            taskId?.let { EcranDetails(viewModelTaches, navController, it) }
         }
     }
 }

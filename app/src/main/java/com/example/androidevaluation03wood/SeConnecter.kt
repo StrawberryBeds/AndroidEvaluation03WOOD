@@ -27,7 +27,7 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun SeConnecter(
-    viewModel: ViewModelTaches, navController: NavHostController
+    viewModelUtilisateur: ViewModelUtilisateur, navController: NavHostController
 ) {
     var nomUtilisateur by remember { mutableStateOf("") }
     var motDePass by remember { mutableStateOf("") }
@@ -89,7 +89,7 @@ fun SeConnecter(
             ) {
                 Button(
                     onClick = {
-                        if (viewModel.verifierUtilisateur(nomUtilisateur, motDePass)) {
+                        if (viewModelUtilisateur.verifierUtilisateur(nomUtilisateur, motDePass)) {
                             navController.navigate("accueil")
                         } else {
                             erreurConnexion = true
