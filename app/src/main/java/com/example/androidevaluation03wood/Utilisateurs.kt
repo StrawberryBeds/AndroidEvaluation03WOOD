@@ -60,13 +60,13 @@ class ViewModelUtilisateur (application: Application): AndroidViewModel(applicat
         return estVerifie
     }
 
-    fun apporteNomFichierUtilisateur(nomUtilisateur: String): String {
-        var nomFichier = "Taches_${nomUtilisateur}"
-        return nomFichier
-    }
+//    fun apporteNomFichierUtilisateur(nomUtilisateur: String): String {
+//        var nomFichier = "Taches_${nomUtilisateur}"
+//        return nomFichier
+//    }
 
     fun deconecterUtilisateur(nomUtilisateur: String) {
-        val nomFichier = apporteNomFichierUtilisateur(nomUtilisateur)
+        val nomFichier = AppOutils.apporteNomFichierUtilisateur(nomUtilisateur)
         val sharedPreferencesUtilisateur =
             getApplication<Application>().getSharedPreferences(nomFichier, Context.MODE_PRIVATE)
         utilisateur.estVerifie = false
@@ -79,7 +79,6 @@ class ViewModelUtilisateur (application: Application): AndroidViewModel(applicat
     }
 
     fun ajouteUtilisateur(nomUtilisateur: String, motDePasse: String) {
-        //       val nouvelleIDTache = (taches.maxOfOrNull { it.idTache } ?: 0) + 1
 
         val nouvelleUtilisateur = Utilisateur(
             nomEtPrenom = nomUtilisateur,

@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,15 +31,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
 @Composable
-fun EcransTaches(viewModel: ViewModelTaches, navController: NavHostController) {
+fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostController) {
 
-    var nouvelleNomTache by remember { mutableStateOf("") }
-    var nouvelleDescriptionTache by remember { mutableStateOf("") }
+    var nouvelleNomTransaction by remember { mutableStateOf("") }
+    var nouvelleDescriptionTransaction by remember { mutableStateOf("") }
     var estTerminee by remember { mutableStateOf(false) }
 
     Scaffold() { paddingValues ->
@@ -54,7 +52,7 @@ fun EcransTaches(viewModel: ViewModelTaches, navController: NavHostController) {
         ) {
             Spacer(modifier = Modifier.padding(8.dp))
             Text(
-                "Nouvelle tache",
+                "Nouvelle transaction",
                 style = MaterialTheme.typography.headlineMedium
             )
 
@@ -64,8 +62,8 @@ fun EcransTaches(viewModel: ViewModelTaches, navController: NavHostController) {
                     .fillMaxWidth()
             ) {
                 BasicTextField(
-                    value = nouvelleNomTache,
-                    onValueChange = { nouvelleNomTache = it },
+                    value = nouvelleNomTransaction,
+                    onValueChange = { nouvelleNomTransaction = it },
                     modifier = Modifier
                         .weight(1f)
                         .border(1.dp, Gray)
@@ -80,8 +78,8 @@ fun EcransTaches(viewModel: ViewModelTaches, navController: NavHostController) {
                     .fillMaxWidth()
             ) {
                 BasicTextField(
-                    value = nouvelleDescriptionTache,
-                    onValueChange = { nouvelleDescriptionTache = it },
+                    value = nouvelleDescriptionTransaction,
+                    onValueChange = { nouvelleDescriptionTransaction = it },
                     modifier = Modifier
                         .weight(1f)
                         .border(1.dp, Gray)
@@ -97,10 +95,10 @@ fun EcransTaches(viewModel: ViewModelTaches, navController: NavHostController) {
             ) {
                 Button(
                     onClick = {
-                        if (nouvelleNomTache.isNotBlank()) {
-                            viewModel.ajouteTache(nouvelleNomTache, nouvelleDescriptionTache)
-                            nouvelleNomTache = ""
-                            nouvelleDescriptionTache = ""
+                        if (nouvelleNomTransaction.isNotBlank()) {
+                            viewModel.ajouteTransaction(nouvelleNomTransaction, nouvelleDescriptionTransaction)
+                            nouvelleNomTransaction = ""
+                            nouvelleDescriptionTransaction = ""
                             estTerminee = false
                         }
                     },
@@ -112,24 +110,24 @@ fun EcransTaches(viewModel: ViewModelTaches, navController: NavHostController) {
                 }
             }
             LazyColumn(modifier = Modifier.padding(top = 16.dp)) {
-                items(items = viewModel.taches) { tache ->
+                items(items = viewModel.transactions) { tache ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        IconButton(onClick = { viewModel.toggleTache(tache.idTache) }) {
+                        IconButton(onClick = { viewModel.toggleTransaction(tache.idTransaction) }) {
                             Icon(
                                 Icons.Default.Done,
                                 contentDescription = "Terminée",
                                 tint = if (tache.estTerminee) Color.Blue else Red
                             )
                         }
-                        IconButton(onClick = { navController.navigate("ecran_details/${tache.idTache}") }) {
+                        IconButton(onClick = { navController.navigate("ecran_details/${tache.idTransaction}") }) {
                             Icon(Icons.Default.Edit, contentDescription = "Modifier")
                         }
-                        Text(tache.nomTache, modifier = Modifier.weight(1f))
+                        Text(tache.nomTransaction, modifier = Modifier.weight(1f))
 
-                        IconButton(onClick = { viewModel.supprimeTache(idTache = tache.idTache) }) {
+                        IconButton(onClick = { viewModel.supprimeTransaction(idTransaction = tache.idTransaction) }) {
                             Icon(Icons.Default.Delete, contentDescription = "Supprimer")
 
 

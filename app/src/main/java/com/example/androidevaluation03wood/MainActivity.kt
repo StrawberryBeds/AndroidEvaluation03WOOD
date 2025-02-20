@@ -22,13 +22,13 @@ import com.example.androidevaluation03wood.ui.theme.AndroidEvaluation03WOODTheme
 // Conversation avec ChatGPT : https://chatgpt.com/share/679fc2ed-1b48-8007-9977-c05e638951ff
 // ChatGPT est utilisé pour (1) régler problèmes entre ViewModel et NavContoller,
 // (2) MainActivity.kt (LauncheEffect),
-// (3) Taches.kt (init apporteDuTaches)
-// (4) Taches (fun ajouteTache)
+// (3) Transactions.kt (init apporteDuTaches)
+// (4) Taches (fun ajouteTransaction)
 // Voir commentaires pour plus de détails au 2, 3, et 4.
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModelTaches: ViewModelTaches by viewModels()
+    private val viewModelTransactions: ViewModelTransactions by viewModels()
     private val viewModelUtilisateur: ViewModelUtilisateur by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 AndroidEvaluation03WOODTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        AndroidEvaluation03WOOD(viewModelTaches, viewModelUtilisateur, navController = rememberNavController())
+                        AndroidEvaluation03WOOD(viewModelTransactions, viewModelUtilisateur, navController = rememberNavController())
                     }
                 }
             }
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AndroidEvaluation03WOOD(
-    viewModelTaches: ViewModelTaches,
+    viewModelTransactions: ViewModelTransactions,
     viewModelUtilisateur: ViewModelUtilisateur,
     navController: NavHostController
 ) {
@@ -68,10 +68,10 @@ fun AndroidEvaluation03WOOD(
     ) {
         composable("se_connecter") { SeConnecter(viewModelUtilisateur, navController) }
         composable("accueil") { Accueil(viewModelUtilisateur, navController) }
-        composable("ecran_taches") { EcransTaches(viewModelTaches, navController) }
+        composable("ecran_transactions") { EcranTransactions(viewModelTransactions, navController) }
         composable("ecran_details/{taskId}") { backStackEntry ->
             val taskId = backStackEntry.arguments?.getString("taskId")?.toIntOrNull()
-            taskId?.let { EcranDetails(viewModelTaches, navController, it) }
+            taskId?.let { EcranDetails(viewModelTransactions, navController, it) }
         }
     }
 }

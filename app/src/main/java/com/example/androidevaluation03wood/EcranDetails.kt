@@ -31,11 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
 @Composable
-fun EcranDetails(viewModel: ViewModelTaches, navController: NavHostController, tacheID: Int) {
-    val tache = viewModel.taches.find { it.idTache == tacheID }
+fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostController, tacheID: Int) {
+    val tache = viewModel.transactions.find { it.idTransaction == tacheID }
 
-    var modifieNomTache by remember { mutableStateOf("${tache?.nomTache}") }
-    var modifieDescriptionTache by remember { mutableStateOf("${tache?.descriptionTache}") }
+    var modifieNomTransaction by remember { mutableStateOf("${tache?.nomTransaction}") }
+    var modifieDescriptionTransaction by remember { mutableStateOf("${tache?.descriptionTransaction}") }
 
     Scaffold() { paddingValues ->
         Column(
@@ -52,8 +52,8 @@ fun EcranDetails(viewModel: ViewModelTaches, navController: NavHostController, t
             if (tache != null) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     BasicTextField(
-                        modifieNomTache,
-                        onValueChange = { modifieNomTache = it },
+                        modifieNomTransaction,
+                        onValueChange = { modifieNomTransaction = it },
                         modifier = Modifier
                             .weight(1f)
                             .border(1.dp, Gray)
@@ -63,8 +63,8 @@ fun EcranDetails(viewModel: ViewModelTaches, navController: NavHostController, t
                 Spacer(modifier = Modifier.padding(8.dp))
                 Row(modifier = Modifier.fillMaxWidth()) {
                     BasicTextField(
-                        modifieDescriptionTache,
-                        onValueChange = { modifieDescriptionTache = it },
+                        modifieDescriptionTransaction,
+                        onValueChange = { modifieDescriptionTransaction = it },
                         modifier = Modifier
                             .weight(1f)
                             .border(1.dp, Gray)
@@ -75,16 +75,16 @@ fun EcranDetails(viewModel: ViewModelTaches, navController: NavHostController, t
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         onClick = {
-                            if (modifieNomTache.isNotBlank()) {
-                                viewModel.modifieTache(
-                                    idTache = tache.idTache,
-                                    modifieNomTache,
-                                    modifieDescriptionTache
+                            if (modifieNomTransaction.isNotBlank()) {
+                                viewModel.modifieTransaction(
+                                    idTransaction = tache.idTransaction,
+                                    modifieNomTransaction,
+                                    modifieDescriptionTransaction
                                 )
-                                modifieNomTache = ""
-                                modifieDescriptionTache = ""
+                                modifieNomTransaction = ""
+                                modifieDescriptionTransaction = ""
                             }
-                            navController.navigate("ecran_taches")
+                            navController.navigate("ecran_transactions")
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -99,7 +99,7 @@ fun EcranDetails(viewModel: ViewModelTaches, navController: NavHostController, t
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    IconButton(onClick = { viewModel.toggleTache(tache.idTache) }) {
+                    IconButton(onClick = { viewModel.toggleTransaction(tache.idTransaction) }) {
                         Icon(
                             Icons.Default.Done,
                             contentDescription = "Terminée",
@@ -108,8 +108,8 @@ fun EcranDetails(viewModel: ViewModelTaches, navController: NavHostController, t
                     }
                     Spacer(modifier = Modifier.padding(8.dp))
                     IconButton(onClick = {
-                        viewModel.supprimeTache(idTache = tache.idTache)
-                        navController.navigate("ecran_taches")
+                        viewModel.supprimeTransaction(idTransaction = tache.idTransaction)
+                        navController.navigate("ecran_transactions")
                     }) {
                         Icon(Icons.Default.Delete, contentDescription = "Supprimer")
                     }

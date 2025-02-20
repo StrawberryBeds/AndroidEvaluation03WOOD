@@ -26,10 +26,6 @@ fun Accueil(
 
     var utilisateur = viewModelUtilisateur.utilisateur
 
-//    var nouvelleNomTache by remember { mutableStateOf("") }
-//    var nouvelleDescriptionTache by remember { mutableStateOf("") }
-//    var estTerminee by remember { mutableStateOf(false) }
-
     Scaffold() { paddingValues ->
         Column(
             modifier = Modifier
@@ -49,12 +45,12 @@ fun Accueil(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
-                    onClick = { navController.navigate("ecran_taches") },
+                    onClick = { navController.navigate("ecran_transactions") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 8.dp)
                 ) {
-                    Text("Mes taches")
+                    Text("Mes transactions")
                 }
             }
             Spacer(
