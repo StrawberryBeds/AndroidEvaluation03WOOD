@@ -17,13 +17,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.androidevaluation03wood.ui.theme.AndroidEvaluation03WOODTheme
 
-// Repositoire GitHub: https://github.com/StrawberryBeds/GestionnaireDeTachesWOOD
+// Repositoire GitHub:
 
 // Conversation avec ChatGPT : https://chatgpt.com/share/679fc2ed-1b48-8007-9977-c05e638951ff
 // ChatGPT est utilisé pour (1) régler problèmes entre ViewModel et NavContoller,
 // (2) MainActivity.kt (LauncheEffect),
-// (3) Transactions.kt (init apporteDuTaches)
-// (4) Taches (fun ajouteTransaction)
 // Voir commentaires pour plus de détails au 2, 3, et 4.
 
 class MainActivity : ComponentActivity() {

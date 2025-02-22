@@ -39,7 +39,7 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
 
     var nouvelleNomTransaction by remember { mutableStateOf("") }
     var nouvelleDescriptionTransaction by remember { mutableStateOf("") }
-    var estTerminee by remember { mutableStateOf(false) }
+    var estRevenu by remember { mutableStateOf(false) }
 
     Scaffold() { paddingValues ->
         Column(
@@ -99,7 +99,7 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
                             viewModel.ajouteTransaction(nouvelleNomTransaction, nouvelleDescriptionTransaction)
                             nouvelleNomTransaction = ""
                             nouvelleDescriptionTransaction = ""
-                            estTerminee = false
+                            estRevenu = false
                         }
                     },
                     modifier = Modifier
@@ -110,24 +110,24 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
                 }
             }
             LazyColumn(modifier = Modifier.padding(top = 16.dp)) {
-                items(items = viewModel.transactions) { tache ->
+                items(items = viewModel.transactions) { transaction ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        IconButton(onClick = { viewModel.toggleTransaction(tache.idTransaction) }) {
+                        IconButton(onClick = { viewModel.toggleTransaction(transaction.idTransaction) }) {
                             Icon(
                                 Icons.Default.Done,
-                                contentDescription = "Terminée",
-                                tint = if (tache.estTerminee) Color.Blue else Red
+                                contentDescription = "Revenu ou Dépense",
+                                tint = if (transaction.estRevenu) Color.Green else Red
                             )
                         }
-                        IconButton(onClick = { navController.navigate("ecran_details/${tache.idTransaction}") }) {
+                        IconButton(onClick = { navController.navigate("ecran_details/${transaction.idTransaction}") }) {
                             Icon(Icons.Default.Edit, contentDescription = "Modifier")
                         }
-                        Text(tache.nomTransaction, modifier = Modifier.weight(1f))
+                        Text(transaction.nomTransaction, modifier = Modifier.weight(1f))
 
-                        IconButton(onClick = { viewModel.supprimeTransaction(idTransaction = tache.idTransaction) }) {
+                        IconButton(onClick = { viewModel.supprimeTransaction(idTransaction = transaction.idTransaction) }) {
                             Icon(Icons.Default.Delete, contentDescription = "Supprimer")
 
 

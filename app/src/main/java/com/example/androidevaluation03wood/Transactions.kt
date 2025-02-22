@@ -11,9 +11,9 @@ import com.google.gson.reflect.TypeToken
 
 data class Transaction(
     val idTransaction: Int,
-    val nomTransaction: String,
-    val descriptionTransaction: String,
-    var estTerminee: Boolean
+    val montant: Double = 0.00,
+    val categorieTransaction: String,
+    var estRevenu: Boolean
 )
 
 class ViewModelTransactions (application: Application): AndroidViewModel(application) {
@@ -49,7 +49,7 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
         val jsonString = gson.toJson(_transactions)
         val editor =
         sharedPreferencesUtilisateur.edit()
-        editor.putString("PREF_KEY_TACHES", jsonString)
+        editor.putString("PREF_KEY_TRANSACTIONS", jsonString)
         editor.apply()
     }
     fun apporteTransactions(nomUtilisateur: String) {
@@ -58,13 +58,13 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
 
         val sharedPreferencesUtilisateur = getApplication<Application>().getSharedPreferences(nomFichier, Context.MODE_PRIVATE)
 //        val jsonStringUtilisateur = sharedPreferences.getString("NOM_ET_PRENOM",null) ?: return
-        val jsonString = sharedPreferencesUtilisateur.getString("PREF_KEY_TACHES", null) ?: return
+        val jsonString = sharedPreferencesUtilisateur.getString("PREF_KEY_TRANSACTIONS", null) ?: return
         val listType = object : TypeToken<List<Transaction>>() {}.type
-        val tacheSauves: List<Transaction> = gson.fromJson(jsonString, listType)
+        val transactionsSauves: List<Transaction> = gson.fromJson(jsonString, listType)
         _transactions.clear()
         estVerifie
         if (estVerifie) {
-            _transactions.addAll(tacheSauves)
+            _transactions.addAll(transactionsSauves)
         } else {
             _transactions.clear()
 //            makeText(LocalContext,"L'utilisateur n'est pas verifié", Toast.LENGTH_SHORT).show()
@@ -79,7 +79,7 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
             idTransaction = nouvelleIDTransaction,
             nomTransaction = nomTransaction,
             descriptionTransaction = descriptionTransaction,
-            estTerminee = false
+            estRevenu = false
         )
         _transactions.add(nouvelleTransaction)
         sauvegarderTransaction(nomUtilisateur = utilisateur.nomUtilisateur)
@@ -97,7 +97,7 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
             idTransaction = nouvelleIDTransaction,
             nomTransaction = nomTransaction,
             descriptionTransaction = descriptionTransaction,
-            estTerminee = false
+            estRevenu = false
         )
         _transactions.add(nouvelleTransaction)
         sauvegarderTransaction(nomUtilisateur = utilisateur.nomUtilisateur)
@@ -109,9 +109,9 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
     }
 
     fun toggleTransaction(idTransaction: Int) {
-        _transactions.replaceAll { tache ->
-            if (tache.idTransaction == idTransaction) tache.copy(estTerminee = !tache.estTerminee)
-            else tache
+        _transactions.replaceAll { transaction ->
+            if (transaction.idTransaction == idTransaction) transaction.copy(estRevenu = !transaction.estRevenu)
+            else transaction
         }
         sauvegarderTransaction(nomUtilisateur = utilisateur.nomUtilisateur)
     }

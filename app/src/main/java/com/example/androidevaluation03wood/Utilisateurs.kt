@@ -61,7 +61,7 @@ class ViewModelUtilisateur (application: Application): AndroidViewModel(applicat
     }
 
 //    fun apporteNomFichierUtilisateur(nomUtilisateur: String): String {
-//        var nomFichier = "Taches_${nomUtilisateur}"
+//        var nomFichier = "Transactions_${nomUtilisateur}"
 //        return nomFichier
 //    }
 
