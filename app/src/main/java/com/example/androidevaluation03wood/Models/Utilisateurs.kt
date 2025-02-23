@@ -1,105 +1,72 @@
 package com.example.androidevaluation03wood.Models
 
 import android.app.Application
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import androidx.compose.runtime.mutableStateListOf
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 data class Utilisateur(
-    val nomEtPrenom: String,
-    val nomUtilisateur: String,
-    val motDePasse: String,
-    var estVerifie: Boolean,
-)
-val utilisateur01 = Utilisateur(
-    nomEtPrenom = "Penny Counter",
-    nomUtilisateur = "user@example.com",
-    motDePasse = "password123",
-    estVerifie = false
+    val nomEtPrenom: String = "Penny Counter",
+    val nomUtilisateur: String = "user@example.com",
+    val motDePasse: String = "password123",
+    var estVerifie: Boolean = false,
 )
 
-val utilisateur02 = Utilisateur(
-    nomEtPrenom = "Ill Manors",
-    nomUtilisateur = "ill@manors.com",
-    motDePasse = "E5 1QA",
-    estVerifie = false
-)
-
-class ViewModelUtilisateur (application: Application): AndroidViewModel(application) {
+class ViewModelUtilisateur(application: Application) : AndroidViewModel(application) {
 
     private val sharedPreferences = application.getSharedPreferences("AppPrefs", MODE_PRIVATE)
-    private val gson = Gson()
-
-    private val _utilisateurs = mutableStateListOf<Utilisateur>() // ViewModel
-    val utilisateurs: List<Utilisateur> get() = _utilisateurs // View
+    private val TAG = "ViewModelUtilisateur"
 
     init {
-        _utilisateurs.add(utilisateur01)
-        _utilisateurs.add(utilisateur02)
-        apporteUtilisateurs()
+        Log.d(TAG, "ViewModelUtilisateur created")
     }
 
-    private val _utilisateur = Utilisateur(
-        nomEtPrenom = sharedPreferences.getString("NOM_ET_PRENOM", "Penny Counter")
-            ?: "Penny Counter",
-        nomUtilisateur = sharedPreferences.getString("NOM_UTILISATEUR", "user@example.com")
-            ?: "user@example.com",
-        motDePasse = sharedPreferences.getString("MOT_DE_PASSE", "password123") ?: "password123",
-        estVerifie = sharedPreferences.getBoolean("UTILISATEUR_VERIFIE", false)
-    )
-    val utilisateur: Utilisateur get() = _utilisateur
+    var utilisateur by mutableStateOf(loadUtilisateur())
+        private set
+
+    private fun loadUtilisateur(): Utilisateur {
+        Log.d(TAG, "loadUtilisateur() called")
+        val nomEtPrenom =
+            sharedPreferences.getString("NOM_ET_PRENOM", "Penny Counter") ?: "Penny Counter"
+        val nomUtilisateur =
+            sharedPreferences.getString("NOM_UTILISATEUR", "user@example.com") ?: "user@example.com"
+        val motDePasse = sharedPreferences.getString("MOT_DE_PASSE", "password123") ?: "password123"
+        val estVerifie = sharedPreferences.getBoolean("UTILISATEUR_VERIFIE", false)
+
+        Log.d(TAG, "Loaded from SharedPreferences:")
+        Log.d(TAG, "  nomEtPrenom: $nomEtPrenom")
+        Log.d(TAG, "  nomUtilisateur: $nomUtilisateur")
+        Log.d(TAG, "  motDePasse: $motDePasse")
+        Log.d(TAG, "  estVerifie: $estVerifie")
+
+        return Utilisateur(nomEtPrenom, nomUtilisateur, motDePasse, estVerifie)
+    }
 
     fun verifierUtilisateur(nomUtilisateur: String, motDePasse: String): Boolean {
+        Log.d(TAG, "verifierUtilisateur() called with:")
+        Log.d(TAG, "  nomUtilisateur: $nomUtilisateur")
+        Log.d(TAG, "  motDePasse: $motDePasse")
+
         val estVerifie =
             (utilisateur.nomUtilisateur == nomUtilisateur) && (utilisateur.motDePasse == motDePasse)
-
+        utilisateur = utilisateur.copy(estVerifie = estVerifie)
         sharedPreferences.edit().putBoolean("UTILISATEUR_VERIFIE", estVerifie).apply()
+
+        Log.d(TAG, "  estVerifie result: $estVerifie")
         return estVerifie
     }
 
-//    fun apporteNomFichierUtilisateur(nomUtilisateur: String): String {
-//        var nomFichier = "Transactions_${nomUtilisateur}"
-//        return nomFichier
-//    }
-
-    fun deconecterUtilisateur(nomUtilisateur: String) {
-        val nomFichier = AppOutils.apporteNomFichierUtilisateur(nomUtilisateur)
-        val sharedPreferencesUtilisateur =
-            getApplication<Application>().getSharedPreferences(nomFichier, Context.MODE_PRIVATE)
-        utilisateur.estVerifie = false
-
-        sharedPreferences.edit().putBoolean("UTILISATEUR_VERIFIE", false).apply()
+    fun deconecterUtilisateur() {
+        Log.d(TAG, "deconneterUtilisateur() called")
+        utilisateur = utilisateur.copy(estVerifie = false)
+        Log.d(TAG, "utilisateur state updated: estVerifie = false")
     }
-
     fun estUtilisateurVerifie(): Boolean {
+        Log.d(TAG, "estUtilisateurVerifie() called")
+        Log.d(TAG, "  returning: ${utilisateur.estVerifie}")
         return utilisateur.estVerifie
-    }
-
-    fun ajouteUtilisateur(nomUtilisateur: String, motDePasse: String) {
-
-        val nouvelleUtilisateur = Utilisateur(
-            nomEtPrenom = nomUtilisateur,
-            nomUtilisateur = nomUtilisateur,
-            motDePasse = motDePasse,
-            estVerifie = false
-        )
-        _utilisateurs.add(nouvelleUtilisateur)
-        sauvegarderUtilisateur()
-    }
-
-    fun sauvegarderUtilisateur() {
-        val jsonString = gson.toJson(_utilisateurs)
-        sharedPreferences.edit().putString("PREF_KEY_UTILISATEURS", jsonString).apply()
-    }
-
-    private fun apporteUtilisateurs() {
-        val jsonString = sharedPreferences.getString("PREF_KEY_UTILISATEURS", null) ?: return
-        val listType = object : TypeToken<List<Utilisateur>>() {}.type
-        val utilisateursSauves: List<Utilisateur> = gson.fromJson(jsonString, listType)
-        _utilisateurs.clear()
-        _utilisateurs.addAll(utilisateursSauves)
     }
 }

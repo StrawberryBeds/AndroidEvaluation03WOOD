@@ -3,7 +3,10 @@ package com.example.androidevaluation03wood.Models
 import android.app.Application
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import androidx.compose.ui.input.key.type
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,27 +22,43 @@ data class Transaction(
     val categorieTransaction: String
 )
 
-class ViewModelTransactions (application: Application): AndroidViewModel(application) {
+class ViewModelTransactionsFactory(
+    private val application: Application,
+    private val viewModelUtilisateur: ViewModelUtilisateur
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ViewModelTransactions::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return ViewModelTransactions(application, viewModelUtilisateur) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+class ViewModelTransactions(
+    application: Application,
+    private val viewModelUtilisateur: ViewModelUtilisateur
+) : AndroidViewModel(application) {
 
     private val sharedPreferences = application.getSharedPreferences("AppPrefs", MODE_PRIVATE)
     private val gson = Gson()
 
-    private val _utilisateur = Utilisateur(
-        nomEtPrenom = sharedPreferences.getString("NOM_ET_PRENOM", "Penny Counter")
-            ?: "Penny Counter",
-        nomUtilisateur = sharedPreferences.getString("NOM_UTILISATEUR", "user@example.com")
-            ?: "user@example.com",
-        motDePasse = sharedPreferences.getString("MOT_DE_PASSE", "password123") ?: "password123",
-        estVerifie = sharedPreferences.getBoolean("UTILISATEUR_VERIFIE", false)
-    )
-    val utilisateur: Utilisateur get() = _utilisateur
+// val _utilisateur = Utilisateur(
+//        nomEtPrenom = sharedPreferences.getString("NOM_ET_PRENOM", "Penny Counter")
+//            ?: "Penny Counter",
+//        nomUtilisateur = sharedPreferences.getString("NOM_UTILISATEUR", "user@example.com")
+//            ?: "user@example.com",
+//        motDePasse = sharedPreferences.getString("MOT_DE_PASSE", "password123") ?: "password123",
+//        estVerifie = sharedPreferences.getBoolean("UTILISATEUR_VERIFIE", false)
+//    )
+//    val utilisateur: Utilisateur get() = _utilisateur
 
     private val _transactions = MutableStateFlow<List<Transaction>>(emptyList()) // ViewModel
     val transactions: StateFlow<List<Transaction>> = _transactions.asStateFlow() // View
 
     
     init {
-        apporteTransactions(nomUtilisateur = utilisateur.nomUtilisateur)
+        apporteTransactions(nomUtilisateur = viewModelUtilisateur.utilisateur.nomUtilisateur)
     }
 
     fun sauvegarderTransaction(nomUtilisateur: String) {
@@ -53,20 +72,17 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
     }
     fun apporteTransactions(nomUtilisateur: String) {
         val nomFichier = AppOutils.apporteNomFichierUtilisateur(nomUtilisateur)
-        val estVerifie = sharedPreferences.getBoolean("UTILISATEUR_VERIFIE", true)
+        val estVerifie = viewModelUtilisateur.utilisateur.estVerifie // Use the correct estVerifie
 
         val sharedPreferencesUtilisateur = getApplication<Application>().getSharedPreferences(nomFichier, Context.MODE_PRIVATE)
-//        val jsonStringUtilisateur = sharedPreferences.getString("NOM_ET_PRENOM",null) ?: return
         val jsonString = sharedPreferencesUtilisateur.getString("PREF_KEY_TRANSACTIONS", null) ?: return
         val listType = object : TypeToken<List<Transaction>>() {}.type
         val transactionsSauves: List<Transaction> = gson.fromJson(jsonString, listType)
 
-
         _transactions.value = if (estVerifie) {
-        transactionsSauves
+            transactionsSauves
         } else {
             emptyList()
-//            makeText(LocalContext,"L'utilisateur n'est pas verifié", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -83,7 +99,7 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
             categorieTransaction,
         )
         _transactions.value = _transactions.value + nouvelleTransaction
-        sauvegarderTransaction(nomUtilisateur = utilisateur.nomUtilisateur)
+        sauvegarderTransaction(nomUtilisateur = viewModelUtilisateur.utilisateur.nomUtilisateur)
     }
 
     fun modifieTransaction(idTransaction: String, selectedOption: String,montant: Double, categorieTransaction: String) {
@@ -91,11 +107,11 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
             if (it.idTransaction == idTransaction) it.copy(selectedOption= selectedOption, montant = montant, categorieTransaction = categorieTransaction)
             else it
         }
-        sauvegarderTransaction(nomUtilisateur = utilisateur.nomUtilisateur)
+        sauvegarderTransaction(nomUtilisateur = viewModelUtilisateur.utilisateur.nomUtilisateur)
     }
 
     fun supprimeTransaction(idTransaction: String) {
         _transactions.value = _transactions.value.filterNot { it.idTransaction == idTransaction }
-        sauvegarderTransaction(nomUtilisateur = utilisateur.nomUtilisateur)
+        sauvegarderTransaction(nomUtilisateur = viewModelUtilisateur.utilisateur.nomUtilisateur)
     }
 }

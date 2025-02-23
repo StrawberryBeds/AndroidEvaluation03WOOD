@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.androidevaluation03wood.ui.theme.AndroidEvaluation03WOODTheme
 import com.example.androidevaluation03wood.Models.ViewModelTransactions
+import com.example.androidevaluation03wood.Models.ViewModelTransactionsFactory
 import com.example.androidevaluation03wood.Models.ViewModelUtilisateur
 import com.example.androidevaluation03wood.View.Accueil
 import com.example.androidevaluation03wood.View.EcranDetails
@@ -32,8 +33,10 @@ import com.example.androidevaluation03wood.View.SeConnecter
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModelTransactions: ViewModelTransactions by viewModels()
     private val viewModelUtilisateur: ViewModelUtilisateur by viewModels()
+    private val viewModelTransactions: ViewModelTransactions by viewModels {
+        ViewModelTransactionsFactory(application, viewModelUtilisateur)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +64,7 @@ fun AndroidEvaluation03WOOD(
 
     // Avec l'aide de ChatGPT pour le fonction LaunchedEffect
     LaunchedEffect(Unit) {
-        if (!viewModelUtilisateur.estUtilisateurVerifie()) {
+        if (!viewModelUtilisateur.utilisateur.estVerifie) {
             navController.navigate("se_connecter")
         }
     }
