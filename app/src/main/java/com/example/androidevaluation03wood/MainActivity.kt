@@ -57,7 +57,7 @@ fun AndroidEvaluation03WOOD(
     navController: NavHostController
 ) {
 
-    val navController = rememberNavController()
+//    val navController = rememberNavController()
 
     // Avec l'aide de ChatGPT pour le fonction LaunchedEffect
     LaunchedEffect(Unit) {
@@ -73,9 +73,9 @@ fun AndroidEvaluation03WOOD(
         composable("se_connecter") { SeConnecter(viewModelUtilisateur, navController) }
         composable("accueil") { Accueil(viewModelUtilisateur, navController) }
         composable("ecran_transactions") { EcranTransactions(viewModelTransactions, navController) }
-        composable("ecran_details/{taskId}") { backStackEntry ->
-            val taskId = backStackEntry.arguments?.getString("taskId")?.toIntOrNull()
-            taskId?.let { EcranDetails(viewModelTransactions, navController, it) }
+        composable("ecran_details/{transactionID}") { backStackEntry ->
+            val transactionID = backStackEntry.arguments?.getString("transactionID")
+            transactionID?.let { EcranDetails(viewModelTransactions, navController, it) }
         }
     }
 }

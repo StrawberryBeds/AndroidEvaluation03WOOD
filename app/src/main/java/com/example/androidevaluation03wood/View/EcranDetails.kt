@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -17,10 +20,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,14 +34,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.androidevaluation03wood.Models.ViewModelTransactions
+import kotlinx.coroutines.flow.filter
 
 @Composable
-fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostController, transactionID: Int) {
-    val transaction = viewModel.transactions.find { it.idTransaction == transactionID }
+fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostController, transactionID: String) {
+
+    val transactions by viewModel.transactions.collectAsState()
+    val transaction = transactions.firstOrNull { it.idTransaction == transactionID }
+
+    val radioOptions = listOf("Revenu", "Dépense")
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+
     var text by remember { mutableStateOf("") }
     var doubleValue by remember { mutableStateOf<Double?>(null) }
     var error by remember { mutableStateOf(false) }
@@ -55,6 +68,28 @@ fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostControl
             Text("Détails de la transaction", style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.padding(8.dp))
 
+            Row(Modifier.selectableGroup()) {
+                radioOptions.forEach { text ->
+                    Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .selectable(
+                            selected = (text == selectedOption),
+                            onClick = { onOptionSelected(text) },
+                            role = Role.RadioButton
+                        )
+                    RadioButton(
+                        selected = (text == selectedOption),
+                        onClick = null // null recommended for accessibility with screen readers
+                    )
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.padding(8.dp))
             if (transaction != null) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     TextField(
@@ -93,8 +128,9 @@ fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostControl
                                 if (montantDouble != null) {
                                     viewModel.modifieTransaction(
                                         idTransaction = transaction.idTransaction,
-                                        montantDouble,
-                                        modifieCategorieTransaction
+                                        selectedOption = selectedOption,
+                                        montant = montantDouble,
+                                        categorieTransaction = modifieCategorieTransaction
                                     )
                                     modifieMontant = ""
                                     modifieCategorieTransaction = ""
@@ -116,13 +152,13 @@ fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostControl
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    IconButton(onClick = { viewModel.toggleTransaction(transaction.idTransaction) }) {
-                        Icon(
-                            Icons.Default.Done,
-                            contentDescription = "Terminée",
-                            tint = if (transaction.estRevenu) Color.Green else Color.Red
-                        )
-                    }
+//                    IconButton(onClick = { viewModel.toggleTransaction(transaction.idTransaction, transaction.estRevenu) }) {
+//                        Icon(
+//                            Icons.Default.Done,
+//                            contentDescription = "Revenu ou Dépense",
+//                            tint = if (transaction.estRevenu) Color.Green else Color.Red
+//                        )
+//                    }
                     Spacer(modifier = Modifier.padding(8.dp))
                     IconButton(onClick = {
                         viewModel.supprimeTransaction(idTransaction = transaction.idTransaction)
