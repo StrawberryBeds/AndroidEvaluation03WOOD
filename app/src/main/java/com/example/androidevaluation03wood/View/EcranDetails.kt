@@ -52,7 +52,7 @@ fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostControl
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Détails de la tâche", style = MaterialTheme.typography.headlineMedium)
+            Text("Détails de la transaction", style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.padding(8.dp))
 
             if (transaction != null) {

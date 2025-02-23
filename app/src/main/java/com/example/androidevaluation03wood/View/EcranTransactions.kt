@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -21,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -32,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.androidevaluation03wood.Models.ViewModelTransactions
@@ -39,9 +42,13 @@ import com.example.androidevaluation03wood.Models.ViewModelTransactions
 @Composable
 fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostController) {
 
-    var nouvelleMontant by remember { mutableDoubleStateOf(0.00) }
+    var nouvelleMontant by remember { mutableStateOf("") }
     var nouvelleCategoryTransaction by remember { mutableStateOf("") }
     var estRevenu by remember { mutableStateOf(false) }
+
+    var text by remember { mutableStateOf("") }
+    var doubleValue by remember { mutableStateOf<Double?>(null) }
+    var error by remember { mutableStateOf(false) }
 
     Scaffold() { paddingValues ->
         Column(
@@ -59,13 +66,21 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
             )
 
             Spacer(modifier = Modifier.padding(8.dp))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                BasicTextField(
-                    value = nouvelleMontant,
-                    onValueChange = { nouvelleMontant.toDouble() },
+                TextField(
+                    value = text,
+                    onValueChange = { nouvelleMontant ->
+                        text = nouvelleMontant
+                        doubleValue = nouvelleMontant.toDoubleOrNull()
+                        error = doubleValue == null && nouvelleMontant.isNotEmpty()
+                    },
+                    label = { Text("100.00") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    isError = error,
                     modifier = Modifier
                         .weight(1f)
                         .border(1.dp, Gray)
@@ -79,9 +94,10 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                BasicTextField(
+                TextField(
                     value = nouvelleCategoryTransaction,
                     onValueChange = { nouvelleCategoryTransaction = it },
+                    label = { Text("Categorie") },
                     modifier = Modifier
                         .weight(1f)
                         .border(1.dp, Gray)
@@ -97,11 +113,17 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
             ) {
                 Button(
                     onClick = {
-                        if (nouvelleMontant.isNaN()) {
-                            viewModel.ajouteTransaction(nouvelleMontant, nouvelleCategoryTransaction)
-                            nouvelleMontant:
-                            nouvelleCategoryTransaction = ""
-                            estRevenu = false
+                        if (nouvelleMontant.isNotEmpty()) {
+                            val montantDouble = nouvelleMontant.toDoubleOrNull()
+                            if (montantDouble != null) {
+                                viewModel.ajouteTransaction(
+                                    montantDouble,
+                                    nouvelleCategoryTransaction
+                                )
+                                nouvelleMontant = ""
+                                nouvelleCategoryTransaction = ""
+                                estRevenu = false
+                            }
                         }
                     },
                     modifier = Modifier
