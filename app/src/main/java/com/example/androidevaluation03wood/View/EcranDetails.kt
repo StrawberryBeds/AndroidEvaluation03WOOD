@@ -1,4 +1,4 @@
-package com.example.androidevaluation03wood
+package com.example.androidevaluation03wood.View
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -18,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,15 +29,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.androidevaluation03wood.Models.ViewModelTransactions
 
 @Composable
 fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostController, transactionID: Int) {
     val transaction = viewModel.transactions.find { it.idTransaction == transactionID }
-
-    var modifieNomTransaction by remember { mutableStateOf("${transaction?.nomTransaction}") }
-    var modifieDescriptionTransaction by remember { mutableStateOf("${transaction?.descriptionTransaction}") }
+    var text by remember { mutableStateOf("") }
+    var doubleValue by remember { mutableStateOf<Double?>(null) }
+    var error by remember { mutableStateOf(false) }
+    var modifieMontant by remember { mutableStateOf("${transaction?.montant}") }
+    var modifieCategorieTransaction by remember { mutableStateOf("${transaction?.categorieTransaction}") }
 
     Scaffold() { paddingValues ->
         Column(
@@ -51,9 +57,16 @@ fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostControl
 
             if (transaction != null) {
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    BasicTextField(
-                        modifieNomTransaction,
-                        onValueChange = { modifieNomTransaction = it },
+                    TextField(
+                        value = text,
+                        onValueChange = { modifieMontant ->
+                            text = modifieMontant
+                            doubleValue = modifieMontant.toDoubleOrNull()
+                            error = doubleValue == null && modifieMontant.isNotEmpty()
+                                        },
+                        label = { Text("Enter a Double") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        isError = error,
                         modifier = Modifier
                             .weight(1f)
                             .border(1.dp, Gray)
@@ -63,8 +76,8 @@ fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostControl
                 Spacer(modifier = Modifier.padding(8.dp))
                 Row(modifier = Modifier.fillMaxWidth()) {
                     BasicTextField(
-                        modifieDescriptionTransaction,
-                        onValueChange = { modifieDescriptionTransaction = it },
+                        modifieCategorieTransaction,
+                        onValueChange = { modifieCategorieTransaction = it },
                         modifier = Modifier
                             .weight(1f)
                             .border(1.dp, Gray)
@@ -75,16 +88,19 @@ fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostControl
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Button(
                         onClick = {
-                            if (modifieNomTransaction.isNotBlank()) {
-                                viewModel.modifieTransaction(
-                                    idTransaction = transaction.idTransaction,
-                                    modifieNomTransaction,
-                                    modifieDescriptionTransaction
-                                )
-                                modifieNomTransaction = ""
-                                modifieDescriptionTransaction = ""
+                            if (modifieMontant.isNotEmpty() ) {
+                                val montantDouble = modifieMontant.toDoubleOrNull()
+                                if (montantDouble != null) {
+                                    viewModel.modifieTransaction(
+                                        idTransaction = transaction.idTransaction,
+                                        montantDouble,
+                                        modifieCategorieTransaction
+                                    )
+                                    modifieMontant = ""
+                                    modifieCategorieTransaction = ""
+                                }
+                                navController.navigate("ecran_transactions")
                             }
-                            navController.navigate("ecran_transactions")
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -93,6 +109,7 @@ fun EcranDetails(viewModel: ViewModelTransactions, navController: NavHostControl
                         Text("Sauvegarder les modifications")
                     }
                 }
+
 
                 Spacer(modifier = Modifier.padding(8.dp))
                 Row(

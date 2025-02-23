@@ -1,4 +1,4 @@
-package com.example.androidevaluation03wood
+package com.example.androidevaluation03wood.View
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,12 +34,13 @@ import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.androidevaluation03wood.Models.ViewModelTransactions
 
 @Composable
 fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostController) {
 
-    var nouvelleNomTransaction by remember { mutableStateOf("") }
-    var nouvelleDescriptionTransaction by remember { mutableStateOf("") }
+    var nouvelleMontant by remember { mutableDoubleStateOf(0.00) }
+    var nouvelleCategoryTransaction by remember { mutableStateOf("") }
     var estRevenu by remember { mutableStateOf(false) }
 
     Scaffold() { paddingValues ->
@@ -62,8 +64,8 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
                     .fillMaxWidth()
             ) {
                 BasicTextField(
-                    value = nouvelleNomTransaction,
-                    onValueChange = { nouvelleNomTransaction = it },
+                    value = nouvelleMontant,
+                    onValueChange = { nouvelleMontant.toDouble() },
                     modifier = Modifier
                         .weight(1f)
                         .border(1.dp, Gray)
@@ -78,8 +80,8 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
                     .fillMaxWidth()
             ) {
                 BasicTextField(
-                    value = nouvelleDescriptionTransaction,
-                    onValueChange = { nouvelleDescriptionTransaction = it },
+                    value = nouvelleCategoryTransaction,
+                    onValueChange = { nouvelleCategoryTransaction = it },
                     modifier = Modifier
                         .weight(1f)
                         .border(1.dp, Gray)
@@ -95,10 +97,10 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
             ) {
                 Button(
                     onClick = {
-                        if (nouvelleNomTransaction.isNotBlank()) {
-                            viewModel.ajouteTransaction(nouvelleNomTransaction, nouvelleDescriptionTransaction)
-                            nouvelleNomTransaction = ""
-                            nouvelleDescriptionTransaction = ""
+                        if (nouvelleMontant.isNaN()) {
+                            viewModel.ajouteTransaction(nouvelleMontant, nouvelleCategoryTransaction)
+                            nouvelleMontant:
+                            nouvelleCategoryTransaction = ""
                             estRevenu = false
                         }
                     },
@@ -125,7 +127,7 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
                         IconButton(onClick = { navController.navigate("ecran_details/${transaction.idTransaction}") }) {
                             Icon(Icons.Default.Edit, contentDescription = "Modifier")
                         }
-                        Text(transaction.nomTransaction, modifier = Modifier.weight(1f))
+                        Text(transaction.montant.toString(), modifier = Modifier.weight(1f))
 
                         IconButton(onClick = { viewModel.supprimeTransaction(idTransaction = transaction.idTransaction) }) {
                             Icon(Icons.Default.Delete, contentDescription = "Supprimer")

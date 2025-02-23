@@ -16,6 +16,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.androidevaluation03wood.ui.theme.AndroidEvaluation03WOODTheme
+import com.example.androidevaluation03wood.Models.ViewModelTransactions
+import com.example.androidevaluation03wood.Models.ViewModelUtilisateur
+import com.example.androidevaluation03wood.View.Accueil
+import com.example.androidevaluation03wood.View.EcranDetails
+import com.example.androidevaluation03wood.View.EcranTransactions
+import com.example.androidevaluation03wood.View.SeConnecter
 
 // Repositoire GitHub:
 

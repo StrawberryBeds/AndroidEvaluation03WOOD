@@ -1,4 +1,4 @@
-package com.example.androidevaluation03wood
+package com.example.androidevaluation03wood.Models
 
 import android.app.Application
 import android.content.Context
@@ -71,14 +71,13 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
         }
     }
 
- fun ajouteTransaction(nomTransaction: String, descriptionTransaction: String) {
+ fun ajouteTransaction(montant: Double, categorieTransaction: String) {
         val nouvelleIDTransaction = (transactions.maxOfOrNull { it.idTransaction } ?: 0) + 1
-
 
         val nouvelleTransaction = Transaction(
             idTransaction = nouvelleIDTransaction,
-            nomTransaction = nomTransaction,
-            descriptionTransaction = descriptionTransaction,
+            montant = montant,
+            categorieTransaction = categorieTransaction,
             estRevenu = false
         )
         _transactions.add(nouvelleTransaction)
@@ -86,7 +85,7 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
     }
 
     // Pas trés contente avec fun modifieTransaction. On veut le simplifier.
-    fun modifieTransaction (idTransaction: Int, nomTransaction: String, descriptionTransaction: String) {
+    fun modifieTransaction (idTransaction: Int, montant: Double, categorieTransaction: String) {
 
         _transactions.removeAll { it.idTransaction == idTransaction }
         sauvegarderTransaction(nomUtilisateur = utilisateur.nomUtilisateur)
@@ -95,8 +94,8 @@ class ViewModelTransactions (application: Application): AndroidViewModel(applica
 
         val nouvelleTransaction = Transaction(
             idTransaction = nouvelleIDTransaction,
-            nomTransaction = nomTransaction,
-            descriptionTransaction = descriptionTransaction,
+            montant = montant,
+            categorieTransaction = categorieTransaction,
             estRevenu = false
         )
         _transactions.add(nouvelleTransaction)

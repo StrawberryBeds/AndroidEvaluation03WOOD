@@ -1,4 +1,4 @@
-package com.example.androidevaluation03wood
+package com.example.androidevaluation03wood.View
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.androidevaluation03wood.Models.ViewModelUtilisateur
 
 @Composable
 fun SeConnecter(
