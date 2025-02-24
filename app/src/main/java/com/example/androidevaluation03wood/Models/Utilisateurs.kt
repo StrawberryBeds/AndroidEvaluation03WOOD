@@ -1,6 +1,7 @@
 package com.example.androidevaluation03wood.Models
 
 import android.app.Application
+import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -20,12 +21,18 @@ class ViewModelUtilisateur(application: Application) : AndroidViewModel(applicat
     private val sharedPreferences = application.getSharedPreferences("AppPrefs", MODE_PRIVATE)
     private val TAG = "ViewModelUtilisateur"
 
+    var utilisateur by mutableStateOf(
+        Utilisateur(
+            estVerifie = false
+        )
+    )
+
     init {
         Log.d(TAG, "ViewModelUtilisateur created")
+        // Load data from SharedPreferences, overriding default values
+        utilisateur = loadUtilisateur()
+        Log.d(TAG, "Initial utilisateur.estVerifie: ${utilisateur.estVerifie}")
     }
-
-    var utilisateur by mutableStateOf(loadUtilisateur())
-        private set
 
     private fun loadUtilisateur(): Utilisateur {
         Log.d(TAG, "loadUtilisateur() called")
@@ -60,10 +67,17 @@ class ViewModelUtilisateur(application: Application) : AndroidViewModel(applicat
     }
 
     fun deconecterUtilisateur() {
-        Log.d(TAG, "deconneterUtilisateur() called")
-        utilisateur = utilisateur.copy(estVerifie = false)
-        Log.d(TAG, "utilisateur state updated: estVerifie = false")
-    }
+            Log.d(TAG, "deconneterUtilisateur() called")
+            utilisateur = utilisateur.copy(estVerifie = false)
+            Log.d(TAG, "utilisateur state updated: estVerifie = false")
+            // Save an empty JSON array to SharedPreferences
+            val nomFichier = AppOutils.apporteNomFichierUtilisateur(utilisateur.nomUtilisateur)
+            val sharedPreferencesUtilisateur = getApplication<Application>().getSharedPreferences(nomFichier, Context.MODE_PRIVATE)
+            val editor = sharedPreferencesUtilisateur.edit()
+            editor.putString("PREF_KEY_TRANSACTIONS", "[]") // Save an empty array
+            editor.apply()
+        }
+
     fun estUtilisateurVerifie(): Boolean {
         Log.d(TAG, "estUtilisateurVerifie() called")
         Log.d(TAG, "  returning: ${utilisateur.estVerifie}")

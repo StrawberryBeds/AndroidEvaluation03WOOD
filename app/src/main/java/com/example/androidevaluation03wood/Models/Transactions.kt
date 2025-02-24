@@ -3,6 +3,7 @@ package com.example.androidevaluation03wood.Models
 import android.app.Application
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import android.util.Log
 import androidx.compose.ui.input.key.type
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
@@ -39,25 +40,17 @@ class ViewModelTransactions(
     application: Application,
     private val viewModelUtilisateur: ViewModelUtilisateur
 ) : AndroidViewModel(application) {
-
-    private val sharedPreferences = application.getSharedPreferences("AppPrefs", MODE_PRIVATE)
+    private val TAG = "ViewModelTransactions" // Ajouté pour le débogage (Gemini)
     private val gson = Gson()
-
-// val _utilisateur = Utilisateur(
-//        nomEtPrenom = sharedPreferences.getString("NOM_ET_PRENOM", "Penny Counter")
-//            ?: "Penny Counter",
-//        nomUtilisateur = sharedPreferences.getString("NOM_UTILISATEUR", "user@example.com")
-//            ?: "user@example.com",
-//        motDePasse = sharedPreferences.getString("MOT_DE_PASSE", "password123") ?: "password123",
-//        estVerifie = sharedPreferences.getBoolean("UTILISATEUR_VERIFIE", false)
-//    )
-//    val utilisateur: Utilisateur get() = _utilisateur
 
     private val _transactions = MutableStateFlow<List<Transaction>>(emptyList()) // ViewModel
     val transactions: StateFlow<List<Transaction>> = _transactions.asStateFlow() // View
 
     
     init {
+        Log.d(TAG, "ViewModelTransactions created") // Logs ajoutés pour le débogage (Gemini)
+        Log.d(TAG, "viewModelUtilisateur.utilisateur.nomUtilisateur: " +
+                "${viewModelUtilisateur.utilisateur.nomUtilisateur}")
         apporteTransactions(nomUtilisateur = viewModelUtilisateur.utilisateur.nomUtilisateur)
     }
 
@@ -85,10 +78,6 @@ class ViewModelTransactions(
             emptyList()
         }
     }
-
-// fun ajouteTransaction(montant: Double, categorieTransaction: String) {
-//     private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
-//     val transactions: StateFlow<List<Transaction>> = _transactions.asStateFlow()
 
     fun ajouteTransaction(selectedOption: String, montant: Double, categorieTransaction: String) {
 

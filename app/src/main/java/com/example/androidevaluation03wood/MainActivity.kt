@@ -10,6 +10,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -45,7 +49,9 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 AndroidEvaluation03WOODTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        AndroidEvaluation03WOOD(viewModelTransactions, viewModelUtilisateur, navController = rememberNavController())
+                        AndroidEvaluation03WOOD(viewModelTransactions,
+                            viewModelUtilisateur,
+                            navController = rememberNavController())
                     }
                 }
             }
@@ -60,11 +66,10 @@ fun AndroidEvaluation03WOOD(
     navController: NavHostController
 ) {
 
-//    val navController = rememberNavController()
+    var shouldNavigate by remember { mutableStateOf(false) } // Avec l'aide de Gemini pour régler l'ecrasement
 
-    // Avec l'aide de ChatGPT pour le fonction LaunchedEffect
-    LaunchedEffect(Unit) {
-        if (!viewModelUtilisateur.utilisateur.estVerifie) {
+    if (shouldNavigate) { // Avec l'aide de Gemini pour régler l'ecrasement
+        LaunchedEffect(navController) {
             navController.navigate("se_connecter")
         }
     }
@@ -82,8 +87,6 @@ fun AndroidEvaluation03WOOD(
         }
     }
 }
-
-
 
 
 
