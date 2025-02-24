@@ -54,8 +54,6 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
     var doubleValue by remember { mutableStateOf<Double?>(null) }
     var error by remember { mutableStateOf(false) }
 
-
-
     Scaffold() { paddingValues ->
         Column(
             modifier = Modifier
@@ -83,7 +81,8 @@ fun EcranTransactions(viewModel: ViewModelTransactions, navController: NavHostCo
                             )
                         RadioButton(
                             selected = (text == selectedOption),
-                            onClick = null // null recommended for accessibility with screen readers
+                            onClick = {
+                                onOptionSelected(text) }
                         )
                         Text(
                             text = text,
